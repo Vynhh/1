@@ -17,12 +17,12 @@ def load_arff_data(filepath: str) -> Optional[pd.DataFrame]:
     try:
         data, meta = arff.loadarff(filepath)
         df = pd.DataFrame(data)
-        
+
         # Convert bytes to strings for categorical columns
         for col in df.columns:
-            if df[col].dtype == 'object':
-                df[col] = df[col].str.decode('utf-8')
-        
+            if df[col].dtype == "object":
+                df[col] = df[col].str.decode("utf-8")
+
         print(f"Data loaded successfully from {os.path.basename(filepath)}: {df.shape}")
         return df
     except Exception as e:
@@ -33,7 +33,7 @@ def load_arff_data(filepath: str) -> Optional[pd.DataFrame]:
 def load_data(filepath: str) -> Optional[pd.DataFrame]:
     """Load data from a CSV or ARFF file"""
     try:
-        if filepath.endswith('.arff'):
+        if filepath.endswith(".arff"):
             return load_arff_data(filepath)
         else:
             data = pd.read_csv(filepath)
@@ -50,85 +50,85 @@ def get_available_datasets() -> List[str]:
     data_dir = "data/OriginalData/MDP"
     if os.path.exists(data_dir):
         for file in os.listdir(data_dir):
-            if file.endswith('.arff'):
+            if file.endswith(".arff"):
                 datasets.append(file)
     return sorted(datasets)
 
 
 def explore_data(data: pd.DataFrame) -> None:
     """Basic data exploration"""
-    print("\n" + "="*50)
+    print("\n" + "=" * 50)
     print("DATA EXPLORATION")
-    print("="*50)
-    
+    print("=" * 50)
+
     print(f"\nDataset shape: {data.shape}")
     print(f"Columns: {data.columns.tolist()}")
-    
+
     print("\nData types:")
     print(data.dtypes)
-    
+
     print("\nMissing values:")
     missing = data.isnull().sum()
     if missing.sum() > 0:
         print(missing[missing > 0])
     else:
         print("No missing values found!")
-    
+
     print("\nData description:")
     print(data.describe())
-    
+
     print("\nFirst 5 rows:")
     print(data.head())
-    
+
     # Check target variable if exists
-    if 'defects' in data.columns:
+    if "defects" in data.columns:
         print("\nTarget variable distribution:")
-        print(data['defects'].value_counts())
+        print(data["defects"].value_counts())
 
 
 def plot_correlations(data: pd.DataFrame, figsize: Tuple[int, int] = (12, 10)) -> None:
     """Plot correlation matrix"""
     plt.figure(figsize=figsize)
-    
+
     # Select only numeric columns
     numeric_data = data.select_dtypes(include=[np.number])
-    
+
     if len(numeric_data.columns) > 0:
         correlation_matrix = numeric_data.corr()
-        
+
         sns.heatmap(
-            correlation_matrix, 
-            annot=True, 
-            cmap='coolwarm', 
+            correlation_matrix,
+            annot=True,
+            cmap="coolwarm",
             center=0,
-            fmt='.2f',
-            square=True
+            fmt=".2f",
+            square=True,
         )
-        plt.title('Correlation Matrix')
+        plt.title("Correlation Matrix")
         plt.tight_layout()
         plt.show()
     else:
         print("No numeric columns found for correlation analysis.")
 
 
-def plot_target_distribution(data: pd.DataFrame, target_col: str = 'defects') -> None:
+def plot_target_distribution(data: pd.DataFrame, target_col: str = "defects") -> None:
     """Plot target variable distribution"""
     if target_col in data.columns:
         plt.figure(figsize=(10, 6))
-        
+
         # Count plot
         plt.subplot(1, 2, 1)
-        data[target_col].value_counts().plot(kind='bar')
-        plt.title(f'{target_col.capitalize()} Distribution')
+        data[target_col].value_counts().plot(kind="bar")
+        plt.title(f"{target_col.capitalize()} Distribution")
         plt.xlabel(target_col.capitalize())
-        plt.ylabel('Count')
-        
+        plt.ylabel("Count")
+
         # Pie chart
         plt.subplot(1, 2, 2)
-        data[target_col].value_counts().plot(kind='pie', autopct='%1.1f%%')
-        plt.title(f'{target_col.capitalize()} Proportion')
-        plt.ylabel('')
-        
+        data[target_col].value_counts().plot(kind="pie", autopct="%1.1f%%")
+        plt.title(f"{target_col.capitalize()} Proportion")
+        plt.ylabel("")
+
         plt.tight_layout()
         plt.show()
     else:
@@ -140,6 +140,7 @@ def save_results(results, filename: str) -> None:
     filepath = f"results/{filename}"
     if isinstance(results, dict):
         import json
+
         with open(filepath, "w") as f:
             json.dump(results, f, indent=2)
     else:
